@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: soc
+      POSTGRES_USER: soc
+      POSTGRES_PASSWORD: soc
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+
+  api:
+    build: ./services/api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
